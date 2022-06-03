@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import SpaceCoinICOJSON from "./contracts/SpaceCoinICO.json";
+import SpaceCoinICOJSON from "../contracts/SpaceCoinICO.json";
 // import SpaceCoinICOJSON from "../artifacts/contracts/SpaceCoinICO.sol/SpaceCoinICO.json";
 import {
   getICOPhase,
   connectToMetamask,
   getIsSeedWhitelisted,
   getReedeemableContributions,
-} from "./init";
+} from "../utils/init";
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 

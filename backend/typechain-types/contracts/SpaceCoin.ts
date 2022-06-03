@@ -36,9 +36,9 @@ export interface SpaceCoinInterface extends utils.Interface {
     "increaseAllowance(address,uint256)": FunctionFragment;
     "isTrasferTaxActive()": FunctionFragment;
     "name()": FunctionFragment;
+    "setTransferTax(bool)": FunctionFragment;
     "spaceCoinICO()": FunctionFragment;
     "symbol()": FunctionFragment;
-    "toggleTax()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
@@ -54,9 +54,9 @@ export interface SpaceCoinInterface extends utils.Interface {
       | "increaseAllowance"
       | "isTrasferTaxActive"
       | "name"
+      | "setTransferTax"
       | "spaceCoinICO"
       | "symbol"
-      | "toggleTax"
       | "totalSupply"
       | "transfer"
       | "transferFrom"
@@ -86,11 +86,14 @@ export interface SpaceCoinInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "setTransferTax",
+    values: [boolean]
+  ): string;
+  encodeFunctionData(
     functionFragment: "spaceCoinICO",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(functionFragment: "toggleTax", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
     values?: undefined
@@ -122,11 +125,14 @@ export interface SpaceCoinInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "setTransferTax",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "spaceCoinICO",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "toggleTax", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
@@ -140,10 +146,12 @@ export interface SpaceCoinInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
+    "transferTaxToggled(bool)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "transferTaxToggled"): EventFragment;
 }
 
 export interface ApprovalEventObject {
@@ -169,6 +177,17 @@ export type TransferEvent = TypedEvent<
 >;
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
+
+export interface transferTaxToggledEventObject {
+  isTrasferTaxActive: boolean;
+}
+export type transferTaxToggledEvent = TypedEvent<
+  [boolean],
+  transferTaxToggledEventObject
+>;
+
+export type transferTaxToggledEventFilter =
+  TypedEventFilter<transferTaxToggledEvent>;
 
 export interface SpaceCoin extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -229,13 +248,14 @@ export interface SpaceCoin extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
+    setTransferTax(
+      _isTaxActive: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     spaceCoinICO(overrides?: CallOverrides): Promise<[string]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    toggleTax(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -285,13 +305,14 @@ export interface SpaceCoin extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
+  setTransferTax(
+    _isTaxActive: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   spaceCoinICO(overrides?: CallOverrides): Promise<string>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
-
-  toggleTax(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -341,11 +362,14 @@ export interface SpaceCoin extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
+    setTransferTax(
+      _isTaxActive: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     spaceCoinICO(overrides?: CallOverrides): Promise<string>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    toggleTax(overrides?: CallOverrides): Promise<void>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -385,6 +409,13 @@ export interface SpaceCoin extends BaseContract {
       to?: string | null,
       value?: null
     ): TransferEventFilter;
+
+    "transferTaxToggled(bool)"(
+      isTrasferTaxActive?: null
+    ): transferTaxToggledEventFilter;
+    transferTaxToggled(
+      isTrasferTaxActive?: null
+    ): transferTaxToggledEventFilter;
   };
 
   estimateGas: {
@@ -420,13 +451,14 @@ export interface SpaceCoin extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
+    setTransferTax(
+      _isTaxActive: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     spaceCoinICO(overrides?: CallOverrides): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    toggleTax(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -482,13 +514,14 @@ export interface SpaceCoin extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    setTransferTax(
+      _isTaxActive: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     spaceCoinICO(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    toggleTax(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

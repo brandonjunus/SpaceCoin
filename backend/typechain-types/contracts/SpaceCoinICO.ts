@@ -30,12 +30,12 @@ import type {
 export interface SpaceCoinICOInterface extends utils.Interface {
   functions: {
     "ICOPhase()": FunctionFragment;
-    "addToWhitelist(address[])": FunctionFragment;
+    "addToAllowlist(address[])": FunctionFragment;
     "advanceICOPhase(uint8)": FunctionFragment;
     "contribute()": FunctionFragment;
     "redeemTokens()": FunctionFragment;
     "reedeemableContributions(address)": FunctionFragment;
-    "seedWhitelist(address)": FunctionFragment;
+    "seedAllowlist(address)": FunctionFragment;
     "setSpaceCoinAddress(address)": FunctionFragment;
     "toggleAllowContributions()": FunctionFragment;
     "totalContributed()": FunctionFragment;
@@ -45,12 +45,12 @@ export interface SpaceCoinICOInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "ICOPhase"
-      | "addToWhitelist"
+      | "addToAllowlist"
       | "advanceICOPhase"
       | "contribute"
       | "redeemTokens"
       | "reedeemableContributions"
-      | "seedWhitelist"
+      | "seedAllowlist"
       | "setSpaceCoinAddress"
       | "toggleAllowContributions"
       | "totalContributed"
@@ -59,7 +59,7 @@ export interface SpaceCoinICOInterface extends utils.Interface {
 
   encodeFunctionData(functionFragment: "ICOPhase", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "addToWhitelist",
+    functionFragment: "addToAllowlist",
     values: [string[]]
   ): string;
   encodeFunctionData(
@@ -79,7 +79,7 @@ export interface SpaceCoinICOInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "seedWhitelist",
+    functionFragment: "seedAllowlist",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -98,7 +98,7 @@ export interface SpaceCoinICOInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "ICOPhase", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "addToWhitelist",
+    functionFragment: "addToAllowlist",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -115,7 +115,7 @@ export interface SpaceCoinICOInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "seedWhitelist",
+    functionFragment: "seedAllowlist",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -133,17 +133,28 @@ export interface SpaceCoinICOInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "AllowlistedAddress(address)": EventFragment;
     "Contribution(address,uint256,uint8,uint256)": EventFragment;
     "PhaseAdvance(uint8)": EventFragment;
     "ReedemTokens(address,uint256)": EventFragment;
-    "WhitelistedAddress(address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AllowlistedAddress"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Contribution"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PhaseAdvance"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReedemTokens"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WhitelistedAddress"): EventFragment;
 }
+
+export interface AllowlistedAddressEventObject {
+  addr: string;
+}
+export type AllowlistedAddressEvent = TypedEvent<
+  [string],
+  AllowlistedAddressEventObject
+>;
+
+export type AllowlistedAddressEventFilter =
+  TypedEventFilter<AllowlistedAddressEvent>;
 
 export interface ContributionEventObject {
   addr: string;
@@ -176,17 +187,6 @@ export type ReedemTokensEvent = TypedEvent<
 
 export type ReedemTokensEventFilter = TypedEventFilter<ReedemTokensEvent>;
 
-export interface WhitelistedAddressEventObject {
-  addr: string;
-}
-export type WhitelistedAddressEvent = TypedEvent<
-  [string],
-  WhitelistedAddressEventObject
->;
-
-export type WhitelistedAddressEventFilter =
-  TypedEventFilter<WhitelistedAddressEvent>;
-
 export interface SpaceCoinICO extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
@@ -216,8 +216,8 @@ export interface SpaceCoinICO extends BaseContract {
   functions: {
     ICOPhase(overrides?: CallOverrides): Promise<[number]>;
 
-    addToWhitelist(
-      _whitelistedAddress: string[],
+    addToAllowlist(
+      _address: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -239,7 +239,7 @@ export interface SpaceCoinICO extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    seedWhitelist(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
+    seedAllowlist(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
 
     setSpaceCoinAddress(
       _spaceCoinAddress: string,
@@ -259,8 +259,8 @@ export interface SpaceCoinICO extends BaseContract {
 
   ICOPhase(overrides?: CallOverrides): Promise<number>;
 
-  addToWhitelist(
-    _whitelistedAddress: string[],
+  addToAllowlist(
+    _address: string[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -282,7 +282,7 @@ export interface SpaceCoinICO extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  seedWhitelist(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+  seedAllowlist(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
   setSpaceCoinAddress(
     _spaceCoinAddress: string,
@@ -302,8 +302,8 @@ export interface SpaceCoinICO extends BaseContract {
   callStatic: {
     ICOPhase(overrides?: CallOverrides): Promise<number>;
 
-    addToWhitelist(
-      _whitelistedAddress: string[],
+    addToAllowlist(
+      _address: string[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -321,7 +321,7 @@ export interface SpaceCoinICO extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    seedWhitelist(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+    seedAllowlist(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
     setSpaceCoinAddress(
       _spaceCoinAddress: string,
@@ -336,6 +336,11 @@ export interface SpaceCoinICO extends BaseContract {
   };
 
   filters: {
+    "AllowlistedAddress(address)"(
+      addr?: string | null
+    ): AllowlistedAddressEventFilter;
+    AllowlistedAddress(addr?: string | null): AllowlistedAddressEventFilter;
+
     "Contribution(address,uint256,uint8,uint256)"(
       addr?: string | null,
       amount?: null,
@@ -357,18 +362,13 @@ export interface SpaceCoinICO extends BaseContract {
       tokens?: null
     ): ReedemTokensEventFilter;
     ReedemTokens(addr?: string | null, tokens?: null): ReedemTokensEventFilter;
-
-    "WhitelistedAddress(address)"(
-      addr?: string | null
-    ): WhitelistedAddressEventFilter;
-    WhitelistedAddress(addr?: string | null): WhitelistedAddressEventFilter;
   };
 
   estimateGas: {
     ICOPhase(overrides?: CallOverrides): Promise<BigNumber>;
 
-    addToWhitelist(
-      _whitelistedAddress: string[],
+    addToAllowlist(
+      _address: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -390,7 +390,7 @@ export interface SpaceCoinICO extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    seedWhitelist(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    seedAllowlist(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     setSpaceCoinAddress(
       _spaceCoinAddress: string,
@@ -411,8 +411,8 @@ export interface SpaceCoinICO extends BaseContract {
   populateTransaction: {
     ICOPhase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    addToWhitelist(
-      _whitelistedAddress: string[],
+    addToAllowlist(
+      _address: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -434,7 +434,7 @@ export interface SpaceCoinICO extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    seedWhitelist(
+    seedAllowlist(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

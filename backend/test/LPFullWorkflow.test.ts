@@ -151,13 +151,11 @@ describe("LP Router Full Workflow Test", function () {
       spceReserve.add(spceToSwap)
     );
     expect(await spce_eth_lp.ethReserve()).to.equal(bBalanceAfter);
-    await spce_eth_lp.getReserves();
 
     // add liquidity again to make sure amts are correct
     spceReserve = await spce_eth_lp.spceReserve();
     ethReserve = await spce_eth_lp.ethReserve();
     let deployerLPTokens = await spce_eth_lp.balanceOf(deployer.address);
-    await spce_eth_lp.getReserves();
     const ethDesired = TEN_ETHER;
     const spceDesired = TEN_ETHER.mul(5);
 
@@ -186,7 +184,6 @@ describe("LP Router Full Workflow Test", function () {
     expect(await spce_eth_lp.balanceOf(deployer.address)).to.equal(
       deployerLPTokens.add(tokensToMint)
     );
-    await spce_eth_lp.getReserves();
 
     // remove liquidity
     const liquidityToRemove = FIVE_ETHER;

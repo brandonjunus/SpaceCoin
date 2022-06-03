@@ -32,6 +32,7 @@ let SpaceCoinFactory: SpaceCoin__factory;
 let spaceCoin: SpaceCoin;
 let SPCE_ETH_LPFactory: SPCE_ETH_LP__factory;
 let spce_eth_lp: SPCE_ETH_LP;
+
 describe("LP Router Full Workflow Test", function () {
   beforeEach(async () => {
     [deployer] = await ethers.getSigners();
@@ -99,8 +100,6 @@ describe("LP Router Full Workflow Test", function () {
       await spce_eth_lp.addLiquidity(ethDesired, spceDesired, 0, 0, {
         value: ethDesired,
       });
-      console.log("ethDesired", ethDesired);
-      console.log("spceDesired", spceDesired);
       const { optimalEth, optimalSpce } = await getOptimalAmounts(
         ethDesired,
         spceDesired,

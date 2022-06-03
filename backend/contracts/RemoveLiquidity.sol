@@ -20,11 +20,11 @@ contract RemoveLiquidity {
         require(ethToRemove > 0, "removeLiquidity: No eth to remove");
         require(spceToRemove > 0, "removeLiquidity: No spce to remove");
         require(
-            ethToRemove > _minEth,
+            ethToRemove >= _minEth,
             "removeLiquidity: Removing below min eth"
         );
         require(
-            spceToRemove > _minSpce,
+            spceToRemove >= _minSpce,
             "removeLiquidity: Removing below min spce"
         );
         return (ethToRemove, spceToRemove);

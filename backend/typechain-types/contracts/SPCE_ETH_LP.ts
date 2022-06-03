@@ -29,7 +29,7 @@ import type {
 
 export interface SPCE_ETH_LPInterface extends utils.Interface {
   functions: {
-    "DECIMAL()": FunctionFragment;
+    "FEE_PERCENTAGE()": FunctionFragment;
     "addLiquidity(uint256,uint256,uint256,uint256)": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -37,14 +37,12 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "ethReserve()": FunctionFragment;
-    "getReserves()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "removeLiquidity(uint256,uint256,uint256)": FunctionFragment;
     "spaceCoin()": FunctionFragment;
     "spceReserve()": FunctionFragment;
     "swap(uint256,uint256)": FunctionFragment;
-    "swapFeePercentage()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -53,7 +51,7 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "DECIMAL"
+      | "FEE_PERCENTAGE"
       | "addLiquidity"
       | "allowance"
       | "approve"
@@ -61,21 +59,22 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
       | "decimals"
       | "decreaseAllowance"
       | "ethReserve"
-      | "getReserves"
       | "increaseAllowance"
       | "name"
       | "removeLiquidity"
       | "spaceCoin"
       | "spceReserve"
       | "swap"
-      | "swapFeePercentage"
       | "symbol"
       | "totalSupply"
       | "transfer"
       | "transferFrom"
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "DECIMAL", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "FEE_PERCENTAGE",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "addLiquidity",
     values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
@@ -99,10 +98,6 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getReserves",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "increaseAllowance",
     values: [string, BigNumberish]
   ): string;
@@ -120,10 +115,6 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
     functionFragment: "swap",
     values: [BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "swapFeePercentage",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -138,7 +129,10 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "DECIMAL", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "FEE_PERCENTAGE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "addLiquidity",
     data: BytesLike
@@ -152,10 +146,6 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ethReserve", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getReserves",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
@@ -171,10 +161,6 @@ export interface SPCE_ETH_LPInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "swapFeePercentage",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -293,7 +279,7 @@ export interface SPCE_ETH_LP extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    DECIMAL(overrides?: CallOverrides): Promise<[BigNumber]>;
+    FEE_PERCENTAGE(overrides?: CallOverrides): Promise<[number]>;
 
     addLiquidity(
       _ethDesired: BigNumberish,
@@ -327,15 +313,6 @@ export interface SPCE_ETH_LP extends BaseContract {
 
     ethReserve(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getReserves(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & {
-        _ethReserve: BigNumber;
-        _spceReserve: BigNumber;
-      }
-    >;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
@@ -361,8 +338,6 @@ export interface SPCE_ETH_LP extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    swapFeePercentage(overrides?: CallOverrides): Promise<[number]>;
-
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -381,7 +356,7 @@ export interface SPCE_ETH_LP extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  DECIMAL(overrides?: CallOverrides): Promise<BigNumber>;
+  FEE_PERCENTAGE(overrides?: CallOverrides): Promise<number>;
 
   addLiquidity(
     _ethDesired: BigNumberish,
@@ -415,12 +390,6 @@ export interface SPCE_ETH_LP extends BaseContract {
 
   ethReserve(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getReserves(
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber] & { _ethReserve: BigNumber; _spceReserve: BigNumber }
-  >;
-
   increaseAllowance(
     spender: string,
     addedValue: BigNumberish,
@@ -446,8 +415,6 @@ export interface SPCE_ETH_LP extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  swapFeePercentage(overrides?: CallOverrides): Promise<number>;
-
   symbol(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -466,7 +433,7 @@ export interface SPCE_ETH_LP extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    DECIMAL(overrides?: CallOverrides): Promise<BigNumber>;
+    FEE_PERCENTAGE(overrides?: CallOverrides): Promise<number>;
 
     addLiquidity(
       _ethDesired: BigNumberish,
@@ -506,15 +473,6 @@ export interface SPCE_ETH_LP extends BaseContract {
 
     ethReserve(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getReserves(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & {
-        _ethReserve: BigNumber;
-        _spceReserve: BigNumber;
-      }
-    >;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
@@ -539,8 +497,6 @@ export interface SPCE_ETH_LP extends BaseContract {
       _minReturn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    swapFeePercentage(overrides?: CallOverrides): Promise<number>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -624,7 +580,7 @@ export interface SPCE_ETH_LP extends BaseContract {
   };
 
   estimateGas: {
-    DECIMAL(overrides?: CallOverrides): Promise<BigNumber>;
+    FEE_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
     addLiquidity(
       _ethDesired: BigNumberish,
@@ -658,8 +614,6 @@ export interface SPCE_ETH_LP extends BaseContract {
 
     ethReserve(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getReserves(overrides?: CallOverrides): Promise<BigNumber>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
@@ -685,8 +639,6 @@ export interface SPCE_ETH_LP extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    swapFeePercentage(overrides?: CallOverrides): Promise<BigNumber>;
-
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -706,7 +658,7 @@ export interface SPCE_ETH_LP extends BaseContract {
   };
 
   populateTransaction: {
-    DECIMAL(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    FEE_PERCENTAGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     addLiquidity(
       _ethDesired: BigNumberish,
@@ -743,8 +695,6 @@ export interface SPCE_ETH_LP extends BaseContract {
 
     ethReserve(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getReserves(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
@@ -769,8 +719,6 @@ export interface SPCE_ETH_LP extends BaseContract {
       _minReturn: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    swapFeePercentage(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

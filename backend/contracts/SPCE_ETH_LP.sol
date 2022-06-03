@@ -7,28 +7,32 @@ import "./AddLiquidity.sol";
 import "./RemoveLiquidity.sol";
 import "./Swap.sol";
 
-import "hardhat/console.sol";
-
+/// @title SpaceCoin / Ethereum Liquidity Pool
+/// @author Melvillian
 contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
-    uint8 public constant swapFeePercentage = 1;
-    uint256 public constant DECIMAL = 10**18;
+    /// @notice Fee Percentage for swapping
+    uint8 public constant FEE_PERCENTAGE = 1;
+
+    /// @notice Reference to the SpaceCoin contract
     SpaceCoin public immutable spaceCoin;
 
+    /// @notice SpaceCoin this contract has on reserve
     uint256 public spceReserve;
+
+    /// @notice ETH this contract has on reserve
     uint256 public ethReserve;
+
+    /// @notice Sets the SpaceCoin address and names the tokens associated with this LP
 
     constructor(address _spaceCoinAddress) ERC20("SPCE_ETH_LP", "SPCE_ETH") {
         spaceCoin = SpaceCoin(_spaceCoinAddress);
     }
 
-    function getReserves()
-        public
-        view
-        returns (uint256 _ethReserve, uint256 _spceReserve)
-    {
-        return (ethReserve, spceReserve);
-    }
-
+    /// @notice Swaps ETH to SPCE or SPCE to ETH
+    /// @dev If swapping ETH, must send msg.value and requires _spceToSwap to be 0
+    /// If swapping SPCE, msg.value must be 0
+    /// @param _spceToSwap Amount of SPCE to swap
+    /// @param _minReturn Minimum amount of either ETH or SPCE to be returned from swap
     function swap(uint256 _spceToSwap, uint256 _minReturn) external payable {
         require(
             _spceToSwap > 0 || msg.value > 0,
@@ -40,7 +44,7 @@ contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
                 msg.value,
                 ethReserve,
                 spceReserve,
-                swapFeePercentage
+                FEE_PERCENTAGE
             );
             require(
                 _spceToTransfer > _minReturn,
@@ -56,7 +60,7 @@ contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
                 _spceToSwap,
                 ethReserve,
                 spceReserve,
-                swapFeePercentage
+                FEE_PERCENTAGE
             );
             spceReserve = _newSpceReserve;
             require(
@@ -78,6 +82,10 @@ contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
         }
     }
 
+    /// @notice Redeem LP tokens to remove liquidity from the contract
+    /// @param _lpTokens Amount of LP tokens to be redeemed for SPCE / ETH
+    /// @param _minEth Minimum ETH to be redeemed. Reverts if > than actual redeemed
+    /// @param _minSpce Minimum SPCE to be redeemed. Reverts if > than actual redeemed
     function removeLiquidity(
         uint256 _lpTokens,
         uint256 _minEth,
@@ -112,6 +120,11 @@ contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
         );
     }
 
+    /// @notice Add liquidity to the pool in exchange for LP tokens
+    /// @param _ethDesired Amount of ETH to be deposited. Must be <= msg.value
+    /// @param _spceDesired SPCE desired to be deposited
+    /// @param _ethMinimum Minimum ETH to be deposited. Reverts if > actual ETH deposited
+    /// @param _spceMinimum Minimum SPCE to be deposited. Reverts if > actual SPCE deposited
     function addLiquidity(
         uint256 _ethDesired,
         uint256 _spceDesired,
@@ -120,7 +133,6 @@ contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
     )
         external
         payable
-        virtual
         returns (
             uint256 _optimalEth,
             uint256 _optimalSpce,
@@ -166,18 +178,23 @@ contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
         return (_optimalEth, _optimalSpce, _tokensToMint);
     }
 
+    /// @notice Emitted when Liquidity is successfully added
     event AddLiquidityEvent(
         uint256 optimalEth,
         uint256 optimalSpce,
         uint256 tokensToMint,
         address indexed to
     );
+
+    /// @notice Emitted when ETH or SPCE is swapped
     event SwapEvent(
         uint256 ethSwapped,
         uint256 spceSwapped,
         bool isEthToSpce,
         address indexed to
     );
+
+    /// @notice Emitted when Liquidity is successfully removed
     event RemoveLiquidityEvent(
         uint256 ethToRemove,
         uint256 spceToRemove,

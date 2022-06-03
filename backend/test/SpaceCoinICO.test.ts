@@ -1,5 +1,5 @@
-import { SpaceCoin__factory } from "./../typechain-types/factories/contracts/SpaceCoin__factory";
-import { SpaceCoinICO } from "./../typechain-types/contracts/SpaceCoinICO";
+import { SpaceCoin__factory } from "../typechain-types/factories/contracts/SpaceCoin__factory";
+import { SpaceCoinICO } from "../typechain-types/contracts/SpaceCoinICO";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
@@ -10,6 +10,7 @@ const ICOPhases = {
   GENERAL: 1,
   OPEN: 2,
 };
+
 const { GENERAL, OPEN } = ICOPhases;
 
 const ONE_ETHER: BigNumber = ethers.utils.parseEther("1");
@@ -91,20 +92,23 @@ describe("SpaceCoin", function () {
       );
     });
     it("Allows owner to toggle transfer tax", async () => {
-      await spaceCoin.toggleTax();
+      await spaceCoin.setTransferTax(true);
       expect(await spaceCoin.isTrasferTaxActive()).to.equal(true);
+      expect(await spaceCoin.isTrasferTaxActive())
+        .to.emit(spaceCoin, "transferTaxToggled")
+        .withArgs(true);
     });
     it("Doesn't allow non-owners to toggle tax", async () => {
-      await expect(spaceCoin.connect(bob).toggleTax()).to.be.revertedWith(
-        "Requires Only Owner"
-      );
+      await expect(
+        spaceCoin.connect(bob).setTransferTax(true)
+      ).to.be.revertedWith("Requires Only Owner");
     });
     it("Charges 2% tax on transfers when tax is active", async () => {
       await spaceCoinICO.advanceICOPhase(GENERAL);
       await spaceCoinICO.connect(bob).contribute({ value: ONE_ETHER });
       await spaceCoinICO.advanceICOPhase(OPEN);
       await spaceCoinICO.connect(bob).redeemTokens();
-      await spaceCoin.toggleTax();
+      await spaceCoin.setTransferTax(true);
       await spaceCoin.connect(bob).approve(alice.address, ONE_ETHER.mul(5));
       await spaceCoin
         .connect(alice)
@@ -161,25 +165,25 @@ describe("SpaceCoin", function () {
         );
       });
       it("Pause funding at any time", async () => {
-        await spaceCoinICO.addToWhitelist([alice.address]);
+        await spaceCoinICO.addToAllowlist([alice.address]);
         await spaceCoinICO.connect(alice).contribute({ value: ONE_ETHER });
         await spaceCoinICO.toggleAllowContributions();
         await expect(
           spaceCoinICO.connect(alice).contribute({ value: ONE_ETHER })
         ).to.be.revertedWith("Contributions Paused");
       });
-      it("Allows Owners to add Seed Investors to the whitelist", async () => {
-        await spaceCoinICO.addToWhitelist([bob.address]);
-        expect(await spaceCoinICO.seedWhitelist(bob.address)).to.equal(true);
-        expect(await spaceCoinICO.seedWhitelist(alice.address)).to.equal(false);
+      it("Allows Owners to add Seed Investors to the allowlist", async () => {
+        await spaceCoinICO.addToAllowlist([bob.address]);
+        expect(await spaceCoinICO.seedAllowlist(bob.address)).to.equal(true);
+        expect(await spaceCoinICO.seedAllowlist(alice.address)).to.equal(false);
       });
-      it("Prevents non-owners to add Seed Investors to the whitelist", async () => {
+      it("Prevents non-owners to add Seed Investors to the allowlist", async () => {
         await expect(
-          spaceCoinICO.connect(bob).addToWhitelist([bob.address])
+          spaceCoinICO.connect(bob).addToAllowlist([bob.address])
         ).to.be.revertedWith("Requires Only Owner");
       });
       it("Prevents token redemptions before phase is OPEN", async () => {
-        await spaceCoinICO.addToWhitelist([bob.address]);
+        await spaceCoinICO.addToAllowlist([bob.address]);
         await spaceCoinICO.connect(bob).contribute({ value: ONE_ETHER });
         await expect(
           spaceCoinICO.connect(bob).redeemTokens()
@@ -198,7 +202,7 @@ describe("SpaceCoin", function () {
         );
       });
       it("Contributions emit a event", async () => {
-        await spaceCoinICO.addToWhitelist([alice.address]);
+        await spaceCoinICO.addToAllowlist([alice.address]);
         await expect(
           spaceCoinICO.connect(alice).contribute({ value: ONE_ETHER })
         )
@@ -225,12 +229,12 @@ describe("SpaceCoin", function () {
     });
     describe("ICO Phases", () => {
       describe("Seed Phase", () => {
-        it("Allows contributions from whitelisted investors", async () => {
-          await spaceCoinICO.addToWhitelist([bob.address]);
+        it("Allows contributions from allowlisted investors", async () => {
+          await spaceCoinICO.addToAllowlist([bob.address]);
           spaceCoinICO.connect(bob).contribute({ value: ONE_ETHER });
         });
         it("Blocks contributions above individual limit (1.5k ether)", async () => {
-          await spaceCoinICO.addToWhitelist([bob.address]);
+          await spaceCoinICO.addToAllowlist([bob.address]);
           await spaceCoinICO
             .connect(bob)
             .contribute({ value: ONE_THOUSAND_ETHER });
@@ -256,7 +260,7 @@ describe("SpaceCoin", function () {
           ];
           await Promise.all(
             bobs.map(async (bob) => {
-              await spaceCoinICO.addToWhitelist([bob.address]);
+              await spaceCoinICO.addToAllowlist([bob.address]);
             })
           );
           await Promise.all(
@@ -266,19 +270,19 @@ describe("SpaceCoin", function () {
                 .contribute({ value: ONE_THOUSAND_FIVE_HUNDRED_ETHER });
             })
           );
-          await spaceCoinICO.addToWhitelist([alice.address]);
+          await spaceCoinICO.addToAllowlist([alice.address]);
           await expect(
             spaceCoinICO.connect(alice).contribute({ value: ONE_ETHER })
           ).to.be.revertedWith("Seed Fund Cap Exceeded");
         });
-        it("Blocks contributions when not whitelisted", async () => {
+        it("Blocks contributions when not allowlisted", async () => {
           await expect(
             spaceCoinICO.connect(alice).contribute({ value: ONE_ETHER })
-          ).to.be.revertedWith("Investor not whitelisted");
+          ).to.be.revertedWith("Investor not allowlisted");
         });
       });
       describe("General Phase", () => {
-        it("Allows contributions from non-whitelisted investors", async () => {
+        it("Allows contributions from non-allowlisted investors", async () => {
           await spaceCoinICO.advanceICOPhase(GENERAL);
           await spaceCoinICO.connect(bob).contribute({ value: ONE_ETHER });
           expect(
@@ -286,7 +290,7 @@ describe("SpaceCoin", function () {
           ).to.equal(ONE_ETHER);
         });
         it("Blocks contributions from seed investors over the general individual cap (1k ether)", async () => {
-          await spaceCoinICO.addToWhitelist([bob.address]);
+          await spaceCoinICO.addToAllowlist([bob.address]);
           await spaceCoinICO
             .connect(bob)
             .contribute({ value: ONE_THOUSAND_ETHER });
@@ -308,13 +312,10 @@ describe("SpaceCoin", function () {
             "General Phase Contributions must be less than 1k ether"
           );
         });
-        it.skip("Blocks contributions above the general cap (30k ether)", async () => {
-          // todo: how am i supposed to test this lol
-        });
       });
       describe("Open Phase", () => {
         it("Allows token redempetions from token and seed phase", async () => {
-          await spaceCoinICO.addToWhitelist([bob.address]);
+          await spaceCoinICO.addToAllowlist([bob.address]);
           await spaceCoinICO.connect(bob).contribute({ value: ONE_ETHER });
           await spaceCoinICO.advanceICOPhase(GENERAL);
           await spaceCoinICO.connect(bob).contribute({ value: ONE_ETHER });
@@ -369,14 +370,12 @@ describe("SpaceCoin", function () {
             "Total Open Phase Contributions must be less than 30k ether"
           );
         });
-        it("Blocks contributions when not whitelisted", async () => {
+        it("Blocks contributions when not allowlisted", async () => {
           await expect(
             spaceCoinICO.connect(alice).contribute({ value: ONE_ETHER })
-          ).to.be.revertedWith("Investor not whitelisted");
+          ).to.be.revertedWith("Investor not allowlisted");
         });
       });
     });
   });
 });
-
-// console.log("what", what);
