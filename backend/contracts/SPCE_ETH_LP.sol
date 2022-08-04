@@ -8,7 +8,7 @@ import "./RemoveLiquidity.sol";
 import "./Swap.sol";
 
 /// @title SpaceCoin / Ethereum Liquidity Pool
-/// @author Melvillian
+/// @author Junus
 contract SPCE_ETH_LP is ERC20, AddLiquidity, Swap, RemoveLiquidity {
     /// @notice Fee Percentage for swapping
     uint8 public constant FEE_PERCENTAGE = 1;

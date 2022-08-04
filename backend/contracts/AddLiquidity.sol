@@ -1,9 +1,5 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
-// import "./SPCE_ETH_LP.sol";
-import "./SpaceCoin.sol";
-
-import "hardhat/console.sol";
 
 contract AddLiquidity {
     function getOptimalAmounts(

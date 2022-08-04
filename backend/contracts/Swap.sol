@@ -2,8 +2,6 @@
 pragma solidity ^0.8.0;
 import "./SpaceCoin.sol";
 
-import "hardhat/console.sol";
-
 contract Swap {
     function getEthToSwap(
         uint256 _ethToSwap,
